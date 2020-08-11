@@ -177,6 +177,16 @@ ElectronCountedData electronCount(SectorStreamThreadedReader* reader,
 
 } // namespace stempy
 
+template <typename It, typename DarkType>
+void declare_electron_count_dark(py::module& m)
+{
+  m.def(
+    "electron_count",
+    (ElectronCountedData(*)(It, It, DarkType, double, double, Dimensions2D)) &
+      electronCount,
+    py::call_guard<py::gil_scoped_release>());
+}
+
 PYBIND11_MODULE(_image, m)
 {
   py::class_<Image<uint64_t>>(m, "_image_uint64", py::buffer_protocol())
@@ -400,56 +410,19 @@ PYBIND11_MODULE(_image, m)
         py::call_guard<py::gil_scoped_release>());
 
   // Electron counting, without gain
-  m.def("electron_count",
-        (ElectronCountedData(*)(StreamReader::iterator, StreamReader::iterator,
-                                Image<double>&, double, double, Dimensions2D)) &
-          electronCount,
-        py::call_guard<py::gil_scoped_release>());
-  m.def("electron_count",
-        (ElectronCountedData(*)(SectorStreamReader::iterator,
-                                SectorStreamReader::iterator, Image<double>&,
-                                double, double, Dimensions2D)) &
-          electronCount,
-        py::call_guard<py::gil_scoped_release>());
-  m.def("electron_count",
-        (ElectronCountedData(*)(PyReader::iterator, PyReader::iterator,
-                                Image<double>&, double, double, Dimensions2D)) &
-          electronCount,
-        py::call_guard<py::gil_scoped_release>());
-  m.def("electron_count",
-        (ElectronCountedData(*)(StreamReader::iterator, StreamReader::iterator,
-                                py::array_t<double>, double, double,
-                                Dimensions2D)) &
-          electronCount,
-        py::call_guard<py::gil_scoped_release>());
-  m.def("electron_count",
-        (ElectronCountedData(*)(
-          SectorStreamReader::iterator, SectorStreamReader::iterator,
-          py::array_t<double>, double, double, Dimensions2D)) &
-          electronCount,
-        py::call_guard<py::gil_scoped_release>());
-  m.def("electron_count",
-        (ElectronCountedData(*)(PyReader::iterator, PyReader::iterator,
-                                py::array_t<double>, double, double,
-                                Dimensions2D)) &
-          electronCount,
-        py::call_guard<py::gil_scoped_release>());
-  m.def("electron_count",
-        (ElectronCountedData(*)(SectorStreamThreadedReader*, Image<double>&,
-                                int, int, double, double, Dimensions2D, bool)) &
-          electronCount,
-        py::call_guard<py::gil_scoped_release>());
+  declare_electron_count_dark<StreamReader::iterator, Image<double>&>(m);
+  declare_electron_count_dark<SectorStreamReader::iterator, Image<double>&>(m);
+  declare_electron_count_dark<PyReader::iterator, Image<double>&>(m);
+  declare_electron_count_dark<SectorStreamThreadedReader::iterator, Image<double>&>(m);
+  declare_electron_count_dark<StreamReader::iterator, py::array_t<double>>(m);
+  declare_electron_count_dark<SectorStreamReader::iterator, py::array_t<double>>(m);
+  declare_electron_count_dark<PyReader::iterator, py::array_t<double>>(m);
+  declare_electron_count_dark<SectorStreamThreadedReader::iterator, py::array_t<double>>(m);
   m.def("electron_count",
         (ElectronCountedData(*)(SectorStreamThreadedReader*, int, int, double,
                                 double, Dimensions2D, bool)) &
           electronCount,
         py::call_guard<py::gil_scoped_release>());
-  m.def(
-    "electron_count",
-    (ElectronCountedData(*)(SectorStreamThreadedReader*, py::array_t<double>,
-                            int, int, double, double, Dimensions2D, bool)) &
-      electronCount,
-    py::call_guard<py::gil_scoped_release>());
 
   // Electron counting without dark reference or gain
   m.def("electron_count",
