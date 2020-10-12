@@ -186,6 +186,52 @@ template std::vector<STEMImage> createSTEMImages(
 
 } // namespace stempy
 
+template <typename T>
+void declare_radial_sum(py::module& m)
+{
+  m.def("radial_sum", &radialSum<T>, py::call_guard<py::gil_scoped_release>());
+}
+
+template <typename InputType, typename DarkType>
+void declare_calculate_thresholds_gain_dark_reference(py::module& m)
+{
+  m.def("calculate_thresholds",
+        (CalculateThresholdsResults<float>(*)(InputType, DarkType, int, double,
+                                              double, py::array_t<float>)) &
+          calculateThresholds,
+        py::call_guard<py::gil_scoped_release>());
+}
+
+template <typename InputType, typename DarkType>
+void declare_calculate_thresholds_dark_reference(py::module& m)
+{
+  m.def("calculate_thresholds",
+        (CalculateThresholdsResults<uint16_t>(*)(InputType, DarkType, int,
+                                                 double, double)) &
+          calculateThresholds,
+        py::call_guard<py::gil_scoped_release>());
+}
+
+template <typename InputType>
+void declare_calculate_thresholds_gain(py::module& m)
+{
+  m.def("calculate_thresholds",
+        (CalculateThresholdsResults<float>(*)(InputType, int, double, double,
+                                              py::array_t<float>)) &
+          calculateThresholds,
+        py::call_guard<py::gil_scoped_release>());
+}
+
+template <typename InputType>
+void declare_calculate_thresholds(py::module& m)
+{
+  m.def(
+    "calculate_thresholds",
+    (CalculateThresholdsResults<uint16_t>(*)(InputType, int, double, double)) &
+      calculateThresholds,
+    py::call_guard<py::gil_scoped_release>());
+}
+
 PYBIND11_MODULE(_image, m)
 {
   py::class_<Image<uint64_t>>(m, "_image_uint64", py::buffer_protocol())
@@ -486,94 +532,36 @@ PYBIND11_MODULE(_image, m)
           electronCount,
         py::call_guard<py::gil_scoped_release>());
 
-  // Calculate thresholds, with gain
-  m.def(
-    "calculate_thresholds",
-    (CalculateThresholdsResults<float>(*)(vector<Block>&, Image<float>&, int,
-                                          double, double, py::array_t<float>)) &
-      calculateThresholds,
-    py::call_guard<py::gil_scoped_release>());
-  m.def(
-    "calculate_thresholds",
-    (CalculateThresholdsResults<float>(*)(vector<PyBlock>&, Image<float>&, int,
-                                          double, double, py::array_t<float>)) &
-      calculateThresholds,
-    py::call_guard<py::gil_scoped_release>());
-  m.def("calculate_thresholds",
-        (CalculateThresholdsResults<float>(*)(vector<Block>&,
-                                              py::array_t<float>, int, double,
-                                              double, py::array_t<float>)) &
-          calculateThresholds,
-        py::call_guard<py::gil_scoped_release>());
-  m.def("calculate_thresholds",
-        (CalculateThresholdsResults<float>(*)(vector<PyBlock>&,
-                                              py::array_t<float>, int, double,
-                                              double, py::array_t<float>)) &
-          calculateThresholds,
-        py::call_guard<py::gil_scoped_release>());
+  // Calculate thresholds, with gain and dark reference
+  declare_calculate_thresholds_gain_dark_reference<vector<Block>&,
+                                                   Image<float>&>(m);
+  declare_calculate_thresholds_gain_dark_reference<vector<PyBlock>&,
+                                                   Image<float>&>(m);
+  declare_calculate_thresholds_gain_dark_reference<vector<Block>&,
+                                                   py::array_t<float>>(m);
+  declare_calculate_thresholds_gain_dark_reference<vector<PyBlock>&,
+                                                   py::array_t<float>>(m);
 
   // Calculate thresholds, without gain
-  m.def("calculate_thresholds",
-        (CalculateThresholdsResults<uint16_t>(*)(vector<Block>&, Image<float>&,
-                                                 int, double, double)) &
-          calculateThresholds,
-        py::call_guard<py::gil_scoped_release>());
-  m.def("calculate_thresholds",
-        (CalculateThresholdsResults<uint16_t>(*)(
-          vector<PyBlock>&, Image<float>&, int, double, double)) &
-          calculateThresholds,
-        py::call_guard<py::gil_scoped_release>());
-  m.def("calculate_thresholds",
-        (CalculateThresholdsResults<uint16_t>(*)(
-          vector<Block>&, py::array_t<float>, int, double, double)) &
-          calculateThresholds,
-        py::call_guard<py::gil_scoped_release>());
-  m.def("calculate_thresholds",
-        (CalculateThresholdsResults<uint16_t>(*)(
-          vector<PyBlock>&, py::array_t<float>, int, double, double)) &
-          calculateThresholds,
-        py::call_guard<py::gil_scoped_release>());
+  declare_calculate_thresholds_dark_reference<vector<Block>&, Image<float>&>(m);
+  declare_calculate_thresholds_dark_reference<vector<PyBlock>&, Image<float>&>(
+    m);
+  declare_calculate_thresholds_dark_reference<vector<Block>&,
+                                              py::array_t<float>>(m);
+  declare_calculate_thresholds_dark_reference<vector<PyBlock>&,
+                                              py::array_t<float>>(m);
 
   // Calculate thresholds, with gain and without darkreference
-  m.def("calculate_thresholds",
-        (CalculateThresholdsResults<float>(*)(vector<Block>&, int, double,
-                                              double, py::array_t<float>)) &
-          calculateThresholds,
-        py::call_guard<py::gil_scoped_release>());
-  m.def("calculate_thresholds",
-        (CalculateThresholdsResults<float>(*)(vector<PyBlock>&, int, double,
-                                              double, py::array_t<float>)) &
-          calculateThresholds,
-        py::call_guard<py::gil_scoped_release>());
-  m.def("calculate_thresholds",
-        (CalculateThresholdsResults<float>(*)(vector<Block>&, int, double,
-                                              double, py::array_t<float>)) &
-          calculateThresholds,
-        py::call_guard<py::gil_scoped_release>());
-  m.def("calculate_thresholds",
-        (CalculateThresholdsResults<float>(*)(vector<PyBlock>&, int, double,
-                                              double, py::array_t<float>)) &
-          calculateThresholds,
-        py::call_guard<py::gil_scoped_release>());
+  declare_calculate_thresholds_gain<vector<Block>&>(m);
+  declare_calculate_thresholds_gain<vector<PyBlock>&>(m);
 
   // Calculate thresholds, without gain and darkreference
-  m.def("calculate_thresholds",
-        (CalculateThresholdsResults<uint16_t>(*)(vector<Block>&, int, double,
-                                                 double)) &
-          calculateThresholds,
-        py::call_guard<py::gil_scoped_release>());
-  m.def("calculate_thresholds",
-        (CalculateThresholdsResults<uint16_t>(*)(vector<PyBlock>&, int, double,
-                                                 double)) &
-          calculateThresholds,
-        py::call_guard<py::gil_scoped_release>());
+  declare_calculate_thresholds<vector<Block>&>(m);
+  declare_calculate_thresholds<vector<PyBlock>&>(m);
 
-  m.def("radial_sum", &radialSum<StreamReader::iterator>,
-        py::call_guard<py::gil_scoped_release>());
-  m.def("radial_sum", &radialSum<SectorStreamReader::iterator>,
-        py::call_guard<py::gil_scoped_release>());
-  m.def("radial_sum", &radialSum<PyReader::iterator>,
-        py::call_guard<py::gil_scoped_release>());
+  declare_radial_sum<StreamReader::iterator>(m);
+  declare_radial_sum<SectorStreamReader::iterator>(m);
+  declare_radial_sum<PyReader::iterator>(m);
   m.def("get_container", &getContainer,
         py::call_guard<py::gil_scoped_release>());
   m.def("create_stem_histogram", &createSTEMHistogram,
