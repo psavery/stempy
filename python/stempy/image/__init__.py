@@ -268,7 +268,7 @@ class ImageArray(np.ndarray):
 
 
 def calculate_average(reader):
-    """Create an average image of all the images.
+    """Hi!!!! Create an average image of all the images.
 
     :param reader: the file reader that has already opened the data.
     :type reader: stempy.io.reader
