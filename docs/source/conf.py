@@ -97,7 +97,8 @@ def autodoc_skip_member_handler(app, what, name, obj, skip, options):
         'ReaderMixin',
         'PyReader',
         'SectorReader',
-        'get_hdf5_reader'
+        'get_hdf5_reader',
+        'SectorThreadedMultiPassReader',
     ]
 
     return name in exclude_names
