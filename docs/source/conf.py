@@ -16,7 +16,7 @@ import sys
 import sphinx_rtd_theme
 from unittest import mock
 
-sys.path.insert(0, os.path.abspath('../../python/stempy'))
+sys.path.insert(0, os.path.abspath('../../python'))
 
 
 # -- Project information -----------------------------------------------------
