@@ -63,6 +63,7 @@ _io_mock._sector_reader = MockReader
 _io_mock._threaded_reader = object
 _io_mock._reader = object
 _io_mock._pyreader = object
+_io_mock._threaded_multi_pass_reader = object
 
 # -- Options for HTML output -------------------------------------------------
 
